@@ -12,24 +12,15 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
 
-// Define plugin path
-define( 'NIAS_WOO_MERGE_PATH', plugin_dir_path( __FILE__ ) );
+function my_plugin_override_woocommerce_templates( $template, $template_name, $template_path ) {
+    $plugin_path = plugin_dir_path( __FILE__ ) . 'woocommerce/';
 
-// Include custom files
-include_once NIAS_WOO_MERGE_PATH . 'review-order.php';
-include_once NIAS_WOO_MERGE_PATH . 'form-checkout.php';
+    // بررسی اینکه آیا تمپلیت درخواست شده با یکی از تمپلیت‌های پلاگین هم‌خوانی دارد
+    if ( file_exists( $plugin_path . $template_name ) ) {
+        $template = $plugin_path . $template_name;
+    }
 
-// Hook to WooCommerce checkout process or any relevant hook
-// For example, to override WooCommerce templates, you might need to use WooCommerce hooks
-// Uncomment and adjust the following code as needed:
+    return $template;
+}
 
- add_filter( 'wc_get_template', 'nias_woo_merge_override_templates', 10, 2 );
- function nias_woo_merge_override_templates( $located, $template_name ) {
-     if ( 'checkout/review-order.php' === $template_name ) {
-         $located = NIAS_WOO_MERGE_PATH . 'review-order.php';
-     } elseif ( 'checkout/form-checkout.php' === $template_name ) {
-         $located = NIAS_WOO_MERGE_PATH . 'form-checkout.php';
-     }
-     return $located;
- }
-?>
+add_filter( 'woocommerce_locate_template', 'my_plugin_override_woocommerce_templates', 10, 3 );
